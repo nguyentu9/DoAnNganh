@@ -1,0 +1,24 @@
+.card img.card-img-top {
+    height: 100px;
+    width: 100px;
+    margin: 0 auto;
+}
+.card {
+    width: 10rem;
+}
+.card .card-body {
+    padding: 0.25rem;
+    font-weight: 500;
+    color:#00629b;
+    font-size: 1em;
+    break-inside: auto;
+    text-align: center;
+}
+
+a {
+    text-decoration: none;
+}
+
+#tag_sinhvien {
+    color:white;
+}

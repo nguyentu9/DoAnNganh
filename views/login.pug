@@ -1,0 +1,12 @@
+extends ./layouts/header
+
+block content
+    .container
+        form.mt-5(action="/login" method="POST")
+            .form-group
+                label(for='masodangnhap') Mã số đăng nhập
+                input#masodangnhap.form-control.w-25(type='text' name='masodangnhap')
+            
+                label(for='matkhau') Mật khẩu
+                input#matkhau.form-control.w-25(type='password' name='matkhau')
+            button.btn.btn-primary(type='submit') Đăng nhập
