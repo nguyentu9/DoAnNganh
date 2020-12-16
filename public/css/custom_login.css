@@ -1,0 +1,3 @@
+.row:last-child {
+    height: calc(100% - 136px);
+}

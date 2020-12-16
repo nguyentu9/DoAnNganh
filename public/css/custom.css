@@ -5,6 +5,7 @@
 }
 .card {
     width: 10rem;
+    
 }
 .card .card-body {
     padding: 0.25rem;
@@ -13,12 +14,26 @@
     font-size: 1em;
     break-inside: auto;
     text-align: center;
-}
-
-a {
     text-decoration: none;
 }
 
-#tag_sinhvien {
+a,div {
+    text-decoration: none;
+}
+
+#tag {
     color:white;
 }
+
+.info {
+    position: absolute;
+    top: 110px;
+    right: 1%;
+    color:white;
+    width: 20rem;
+    display: flex;
+    justify-content: space-between;
+    box-sizing: border-box;
+}
+
+ 

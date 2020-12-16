@@ -1,0 +1,28 @@
+extends ../layouts/header.pug
+append head
+    title='Trang thông tin'
+    link(rel="stylesheet", href="/css/custom.css")
+
+block content
+    nav.navbar.navbar-light.bg-blue.banner(style='background-image: url("/images/bg_banner.png");')
+            a.navbar-brand(href='/giangvien')
+                img.d-inline-block.align-top(src='/images/banner.png')
+            h4#tag Giảng viên
+    div.info
+        p= 'Họ tên: ' + hoten
+        div.signout
+            a(href="#") Đăng xuất
+    .container.pt-5
+        .row
+            .col-sm-6.p-2= `Mã giảng viên: ${user.id_gv}`
+            .col-sm-6.p-2= `Họ tên: ${user.hoten}`
+        .row
+            .col-sm-6.p-2= `Giới tính: ${user.gioitinh == 1 ? 'Nam' : 'Nữ'}`
+            .col-sm-6.p-2= `Đơn vị: ${user.id_donvi}`
+        .row
+            .col-sm-6.p-2= `Học hàm: ${user.hocham ? user.hocham : 'Không có'}`
+            .col-sm-6.p-2= `Học vị: ${user.hocvi}`
+        .row     
+            .col-sm-6.p-2= `SĐT: ${user.sdt}`
+            .col-sm-6.p-2= `Email: ${user.email}`
+            

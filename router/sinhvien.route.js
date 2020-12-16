@@ -1,9 +1,11 @@
-var express = require('express');
-var router = express.Router();
-var controller = require('../controller/sinhvien.controller');
+const { Router } = require('express');
+let router = Router();
+const controller = require('../controller/sinhvien.controller');
+const sinhvienMiddleware = require('../middleware/sinhvien.middleware');
 
-
-router.get('/', controller.index);
-
+router.get('/', sinhvienMiddleware.checkRole,controller.index);
+router.get('/logout', controller.logout);
+router.get('/thongtinsinhvien', controller.thongTinSinhVien)
+router.get('/dangkyhocphan', controller.dangKyHocPhan);
 
 module.exports = router;

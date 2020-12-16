@@ -1,0 +1,11 @@
+extends ../layouts/header.pug
+append head
+    title='Trang thông tin'
+    link(rel="stylesheet", href="/css/custom_sv.css")
+
+block content
+    nav.navbar.navbar-light.bg-blue.banner(style='background-image: url("/images/bg_banner.png");')
+            a.navbar-brand(href='/sinhvien')
+                img.d-inline-block.align-top(src='/images/banner.png')
+            h4#tag_sinhvien Sinh viên
+    .container.pt-5
