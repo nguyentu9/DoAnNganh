@@ -1,11 +1,135 @@
 extends ../layouts/header.pug
 append head
-    title='Trang thông tin'
-    link(rel="stylesheet", href="/css/custom_sv.css")
+    title='Đăng ký học phần'
+    script(src='https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js')
 
 block content
     nav.navbar.navbar-light.bg-blue.banner(style='background-image: url("/images/bg_banner.png");')
-            a.navbar-brand(href='/sinhvien')
-                img.d-inline-block.align-top(src='/images/banner.png')
-            h4#tag_sinhvien Sinh viên
+        a.navbar-brand(href='/sinhvien')
+            img.d-inline-block.align-top(src='/images/banner.png')
+        h4#tag Sinh viên
+    div.info
+        p= 'Họ tên: ' + hoten
+        div.signout
+            a(href="/giangvien/logout") Đăng xuất
+
     .container.pt-5
+        .row
+            .col
+                table.table.table-hover
+                    thead
+                        tr
+                            th STT
+                            th Mã học phần
+                            th Tên học phần
+                            th Tín chỉ
+                            th Đăng ký
+                            th Xoá đăng ký
+                            th 
+                    tbody
+                        - var n = 1;
+                        each mon in dsmonhoc
+                            tr
+                                td= n++
+                                td= mon.id_monhoc
+                                td= mon.tenmonhoc
+                                td= mon.sotinchi
+                                td
+                                    button.btn.btn-primary(type='button' data-toggle='modal' data-target='#myModal' + n) Chọn
+                                    // Nút đăng ký
+                                    .modal.fade(role='dialog' id='myModal' + n)
+                                        .modal-dialog.modal-xl.modal-dialog-centered(style="max-width: 1350px!important;")
+                                            .modal-content
+                                                .modal-header
+                                                    // Tiêu đề 
+                                                    h5.modal-title= mon.id_monhoc + ' - ' + mon.tenmonhoc
+                                                    button.close(type='button' data-dismiss='modal')
+                                                        span(aria-hidden='true') &times;
+                                                        span.sr-only Close
+                                                .modal-body
+                                                    .container-fluid
+                                                        .row
+                                                            .col
+                                                                table.table.table-hover
+                                                                    thead
+                                                                        tr
+                                                                            th Thứ
+                                                                            th Mã học phần
+                                                                            th Nhóm học phần
+                                                                            th Tên học phần
+                                                                            th Tiết học
+                                                                            th Tên cán bộ
+                                                                            th Tên phòng
+                                                                            th Tuần học
+                                                                            th
+
+                                                                    tbody
+                                                                        each chitietmon in chitiethocphan
+                                                                            if mon.id_monhoc == chitietmon.id_monhoc
+                                                                                tr
+                                                                                    td= chitietmon.thu
+                                                                                    td= chitietmon.id_monhoc
+                                                                                    td= chitietmon.nhom
+                                                                                    td= chitietmon.tenmonhoc
+                                                                                    td= chitietmon.tietday
+                                                                                    td= chitietmon.hoten
+                                                                                    td= chitietmon.phonghoc
+                                                                                    td= chitietmon.tuan
+                                                                                    td
+                                                                                        btn.btn.btn-primary(type='button' onclick=`dangky(${chitietmon.id_monhoc}, ${chitietmon.nhom})`) Đăng ký
+                                td
+                                    button.btn.btn-danger(type='button' data-toggle='modal' data-target='#myModal2' + n) Chọn 
+                                    // Nút huỷ đăng ký
+                                    .modal.fade(role='dialog' id='myModal2' + n)
+                                        .modal-dialog.modal-sm.modal-dialog-centered
+                                            .modal-content
+                                                .modal-header
+                                                    h5.modal-title Thông báo
+                                                    button.close(type='button' data-dismiss='modal')
+                                                        span(aria-hidden='true') &times;
+                                                        span.sr-only Close
+                                                .modal-body
+                                                    p Bạn có chắc muốn xoá?
+                                                    btn.btn.btn-danger Đồng ý
+                                                    btn.btn.btn-light Huỷ
+    
+    .container-fluid.pt-5
+        .row
+            .col
+                .h3 Thời khoá biểu
+        .row
+            .col
+                table.table.table-hover
+                    thead
+                        tr
+                            th STT
+                            th Mã học phần
+                            th Tên học phần
+                            th Tín chỉ
+                            th Đăng ký
+                            th Xoá đăng ký
+                            th 
+                    tbody
+                        - var n = 1;
+                        if dsmonhoc
+                            each mon in dsmonhoc
+                                tr
+                                    td= n++
+                                    td= mon.id_monhoc
+                                    td= mon.tenmonhoc
+                                    td= mon.sotinchi
+                                    td
+
+    script.
+        function dangky(maHP, nhomHP) {
+            axios({
+                method: 'post',
+                url:'/sinhvien/dangkyhocphan',
+                data: {
+                    maHP,
+                    nhomHP
+                }
+            });
+            location.reload();
+            return;
+        }

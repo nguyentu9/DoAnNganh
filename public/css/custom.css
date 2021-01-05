@@ -36,4 +36,9 @@ a,div {
     box-sizing: border-box;
 }
 
- 
+ a {
+     color:white;
+ }
+ a:hover {
+     color:red;
+ }

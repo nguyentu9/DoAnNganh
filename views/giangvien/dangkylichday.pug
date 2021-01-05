@@ -1,18 +1,38 @@
 extends ../layouts/header.pug
 append head
-    title='Trang thông tin'
-    link(rel="stylesheet", href="/css/custom.css")
+    title='Đăng ký giảng dạy'
+    link(rel="stylesheet" href="/css/custom.css")
 
 block content
     nav.navbar.navbar-light.bg-blue.banner(style='background-image: url("/images/bg_banner.png");')
-            a.navbar-brand(href='/giangvien')
-                img.d-inline-block.align-top(src='/images/banner.png')
-            h4#tag Giảng viên
+        a.navbar-brand(href='/giangvien')
+            img.d-inline-block.align-top(src='/images/banner.png')
+        h4#tag Giảng viên
     div.info
         p= 'Họ tên: ' + hoten
         div.signout
-            a(href="/sinhvien/logout") Đăng xuất
+            a(href="/giangvien/logout") Đăng xuất
     .container.pt-5
-        
-        
-            
+        .row
+            .col
+                table.table.table-hover
+                    thead
+                        tr
+                            th STT
+                            th Mã học phần
+                            th Tên học phần
+                            th Số tín chỉ
+
+                    tbody
+                        - var n = 1;
+                        each mon in danhsachmon
+                            tr
+                                td= n++
+                                td= mon.id_monhoc
+                                td= mon.tenmonhoc
+                                td= mon.sotinchi
+
+                
+
+
+

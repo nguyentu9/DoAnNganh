@@ -1,57 +1,60 @@
-const {db, promisePool } = require('../db');
-const randomstring = require('randomstring');
-module.exports.login = (req, res, next) => {
+// const {db, promisePool } = require('../db');
+const db = require('../config/db');
+const { TaiKhoan } = require('../model/model'); 
+const jwt = require('jsonwebtoken');
+
+module.exports.dangnhap = (req, res, next) => {
     res.render('login');
 };
 
-module.exports.postLogin = async (req, res, next) => {
-    var { masodangnhap, matkhau: mkdangnhap } = req.body;
-    if (masodangnhap.length == 0 || mkdangnhap.length == 0) {
+module.exports.postDangnhap = async (req, res) => {
+
+    const { masodangnhap, matkhau: matkhaudangnhap } = req.body;
+
+    if (masodangnhap.length == 0 || matkhaudangnhap.length == 0) {
         res.render('login', {
             error: 'Thông tin đăng nhập không được để trống'
         });
         return;
     }
 
-    let sql = `select * from taikhoan where masodangnhap=${db.escape(masodangnhap)} limit 1`;
-    let [rows] = await promisePool.query(sql);
-
-    if (rows.length == 0) {
-        res.render('login', {
-            error: 'Tài khoản không tồn tại'
+    try {
+        var row = await TaiKhoan.findOne({ 
+            where: { 
+                masodangnhap,
+                matkhau : matkhaudangnhap
+            }
         });
-        return;
+    } catch (e) {
+        console.log(e);
     }
 
-    let { matkhau, vaitro } = rows[0];
-    if (matkhau != mkdangnhap) {
+
+    if (!row) {
         res.render('login', {
             error: 'Tài khoản hoặc mật khẩu sai'
         });
         return;
     }
-    global.user = { masodangnhap, vaitro };
-
-    
-    
-    res.cookie(
-        'id',
+    let { vaitro } = row;
+    let data = {
         masodangnhap,
+        vaitro
+    }
+    
+    let token = await jwt.sign(
+        data, 
+        process.env.JWT_KEY, 
+        { expiresIn: process.env.tokenLife }
+    );
+
+    res.cookie( 'token',
+        token,
         {
-            signed: true,
-            expires: new Date(Date.now() + 300000),
             httpOnly: true
         }
     );
     
-    if (vaitro == 'sv') {
-        let _sv = await promisePool.query(`select * from sinhvien where id_sv='${masodangnhap}'`);
-        global.user.hoten  = _sv[0][0].hoten;
-        res.redirect('sinhvien');
-    } else {
-        let _gv = await promisePool.query(`select * from giangvien where id_gv='${masodangnhap}'`);
-        global.user.hoten  = _gv[0][0].hoten;
-        res.redirect('giangvien');
-    }
-
+    if( vaitro == 'sv') res.redirect('sinhvien');
+    else res.redirect('giangvien');
 };

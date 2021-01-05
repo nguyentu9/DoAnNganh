@@ -3,17 +3,20 @@ append head
     title='Trang đăng nhập'
     link(rel="stylesheet", href="/css/custom_login.css")
 block content
-    .container-fluid.vh-100
+    nav.navbar.navbar-light.bg-blue.banner(style='background-image: url("/images/bg_banner.png");')
+        a.navbar-brand(href='/giangvien')
+            img.d-inline-block.align-top(src='/images/banner.png')
+    .container-fluid
         .row                        
             .col.d-flex.justify-content-center
                     form(action="/login" method="POST").d-flex.justify-content-center.align-items-center.flex-column
-                        if errorc
+                        if error
                             .alert.alert-danger= error
                         .form-group
                             label(for='masodangnhap') Mã số đăng nhập
-                            input#masodangnhap.form-control(type='text' name='masodangnhap' required)
+                            input#masodangnhap.form-control(type='text' name='masodangnhap')
 
                             label(for='matkhau') Mật khẩu
-                            input#matkhau.form-control(type='password' name='matkhau' required)
+                            input#matkhau.form-control(type='password' name='matkhau')
                             
                             button.btn.btn-primary.mt-2(type='submit') Đăng nhập

@@ -1,0 +1,53 @@
+extends ../layouts/header.pug
+append head
+    title='Trang thông tin'
+    link(rel="stylesheet", href="/css/custom_qldiem.css")
+block content
+    nav.navbar.navbar-light.bg-blue.banner(style='background-image: url("/images/bg_banner.png");')
+            a.navbar-brand(href='/giangvien')
+                img.d-inline-block.align-top(src='/images/banner.png')
+            h4#tag Giảng viên
+    div.info
+        p= 'Họ tên: ' + hoten
+        div.signout
+            a(href="/giangvien/logout") Đăng xuất
+
+    .container.pt-5
+        .row
+            .col
+                table.table.table-hover
+                    thead
+                        tr
+                            th STT
+                            th Mã học phần
+                            th Tên học phần
+                            th Nhóm học phần
+                            th Trạng thái
+                            th Kết quả nhập điểm
+                            th 
+                    tbody
+                        - var n = 1;
+                        each mon in diem
+                            tr
+                                td= n++
+                                td= mon.id_monhoc
+                                td= mon.tenmonhoc
+                                td= mon.nhom
+                                td
+                                    
+                                td
+                                    btn.btn.btn-primary(type='button') In
+                                td
+                                    button.btn.btn-primary(type='button' data-toggle='modal' data-target='#myModal' + n) Chọn
+                                    // Modal
+                                    .modal.fade(role='dialog' id='myModal' + n)
+                                        .modal-dialog.modal-sm.modal-dialog-centered
+                                            .modal-content
+                                                .modal-header
+                                                    button.close(type='button' data-dismiss='modal')
+                                                        span(aria-hidden='true') &times;
+                                                        span.sr-only Close
+                                                    h4.modal-title
+                                                .modal-body
+                                                    p Tải file lên
+                                                   

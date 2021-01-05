@@ -13,4 +13,27 @@ block content
         div.signout
             a(href="/giangvien/logout") Đăng xuất
     .container.pt-5
-        
+        .container.pt-5
+        .row
+            .col
+                table.table.table-hover
+                    thead
+                        tr
+                            th STT
+                            th Thứ
+                            th Mã học phần
+                            th Tên học phần
+                            th Tiết dạy
+                            th Phòng học
+                            th Tuần
+                    tbody
+                        - var n = 1;
+                        each mon in lichday
+                            tr
+                                td= n++
+                                td= mon.thu
+                                td= mon.id_monhoc
+                                td= mon.tenmonhoc
+                                td= mon.tietday
+                                td= mon.phonghoc
+                                td= mon.tuan
