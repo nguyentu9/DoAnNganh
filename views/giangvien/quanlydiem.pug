@@ -2,6 +2,7 @@ extends ../layouts/header.pug
 append head
     title='Trang thông tin'
     link(rel="stylesheet", href="/css/custom_qldiem.css")
+    script(src='https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js')
 block content
     nav.navbar.navbar-light.bg-blue.banner(style='background-image: url("/images/bg_banner.png");')
             a.navbar-brand(href='/giangvien')
@@ -13,6 +14,17 @@ block content
             a(href="/giangvien/logout") Đăng xuất
 
     .container.pt-5
+        if er
+            .row
+                .col-4.mx-auto
+                    .alert.alert-danger= er
+        if ss
+            .row
+                .col-4.mx-auto
+                    .alert.alert-success= ss
+        .row
+            .col
+                h3 Quản lý điểm
         .row
             .col
                 table.table.table-hover
@@ -33,21 +45,52 @@ block content
                                 td= mon.id_monhoc
                                 td= mon.tenmonhoc
                                 td= mon.nhom
-                                td
-                                    
-                                td
-                                    btn.btn.btn-primary(type='button') In
-                                td
-                                    button.btn.btn-primary(type='button' data-toggle='modal' data-target='#myModal' + n) Chọn
-                                    // Modal
-                                    .modal.fade(role='dialog' id='myModal' + n)
-                                        .modal-dialog.modal-sm.modal-dialog-centered
-                                            .modal-content
-                                                .modal-header
-                                                    button.close(type='button' data-dismiss='modal')
-                                                        span(aria-hidden='true') &times;
-                                                        span.sr-only Close
-                                                    h4.modal-title
-                                                .modal-body
-                                                    p Tải file lên
-                                                   
+                                if mon.trangthai == 1
+                                    td Đã nhập điểm
+                                    td
+                                        btn.btn.btn-primary(type='button') In kết quả
+                                    td
+                                if mon.trangthai == null
+                                    td Chưa nhập điểm
+                                    td
+                                        
+                                    td
+                                        button.btn.btn-primary(type='button' data-toggle='modal' data-target='#myModal' + n) Chọn
+                                        // Modal
+                                        .modal.fade(role='dialog' id='myModal' + n)
+                                            .modal-dialog.modal-md.modal-dialog-centered
+                                                .modal-content
+                                                    .modal-header
+                                                        h5.modal-title= mon.id_monhoc + " - " + mon.nhom + " - " + mon.tenmonhoc + " - Nhập điểm"
+                                                        button.close(type='button' data-dismiss='modal')
+                                                            span(aria-hidden='true') &times;
+                                                            span.sr-only Close
+                                                    .modal-body
+                                                        h6.d-inline-block(style='padding:8.5px; margin:0') Lấy file mẫu:
+                                                        button.btn.btn-link.d-inline(style='padding:6px; margin:0; border:none;' onclick=`layFileMau(${mon.id_monhoc}, '${mon.tenmonhoc}', ${mon.nhom})`)  Tải xuống
+                                                        br
+                                                        h6.d-inline-block(style='padding:8.5px; margin:0')  Tải file lên
+                                                        form(action='/giangvien/quanlydiem' method='post' enctype="multipart/form-data")
+                                                            label(for='file')
+                                                            input#file(type='file' name='file').btn.btn-light
+                                                            br
+                                                            br
+                                                            input(type='submit').btn.btn-primary
+
+
+    script.
+        function layFileMau(maHP, tenHP, nhomHP) {
+             axios({
+                method: 'post',
+                url:'/giangvien/fileMau',
+                data: {
+                    maHP,
+                    tenHP,
+                    nhomHP
+                },
+                responseType: 'arraybuffer'
+            }).then( res => {
+                window.open('http://localhost:3000/templates/' + res.headers["content-disposition"].split(`"`)[1], '_blank');
+            }).catch( err => console.log(err));
+        }
+        

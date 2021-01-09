@@ -1,13 +1,12 @@
 const { Sequelize, DataTypes } = require('sequelize');
 const db = require('../config/db');
-
-const GiangDay = db.define('giangday', {
-    id_giangday: {
+const MonHocDaDangKy = db.define('dangkymonhoc', {
+    id_dkmh: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true
     },
-    id_gv: {
+    id_sv: {
         type: DataTypes.STRING
     },
     id_monhoc: {
@@ -22,22 +21,13 @@ const GiangDay = db.define('giangday', {
     id_namhoc: {
         type: DataTypes.INTEGER
     },
-    tietday: {
-        type: DataTypes.STRING
+    ngaydk: {
+        type: DataTypes.DATE
     },
-    phonghoc: {
-        type: DataTypes.STRING
-    },
-    thu: {
-        type: DataTypes.INTEGER
-    },
-    tuan: {
-        type: DataTypes.INTEGER
-    },
-    trangthai: {
-        type: DataTypes.BOOLEAN,
+    ngayhuydk: {
+        type: DataTypes.DATE,
         allowNull: true
     }
-})
+});
 
-module.exports = GiangDay;
+module.exports = MonHocDaDangKy;

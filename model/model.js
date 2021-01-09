@@ -4,46 +4,18 @@ const db = require('../config/db');
 const TaiKhoan = require('./taikhoan.model');
 const GiangVien = require('./giangvien.model');
 const Khoa = require('./khoa.model');
-const SinhVien = db.define('sinhvien', {
-    id_sv: {
-        type: DataTypes.STRING,
-        primaryKey: true
-    },
-    hoten: {
-        type: DataTypes.STRING
-    },
-    ngaysinh: {
-        type: DataTypes.DATE
-    },
-    noisinh: {
-        type: DataTypes.STRING
-    },
-    gioitinh: {
-        type: DataTypes.BOOLEAN
-    },
-    cmnd: {
-        type: DataTypes.STRING
-    },
-    sdt: {
-        type: DataTypes.STRING
-    },
-    email: {
-        type: DataTypes.STRING
-    },
-    id_lop: {
-        type: DataTypes.STRING
-    }
-});
-
+const SinhVien = require('./sinhvien.model');
 const MonHoc = require('./monhoc.model');
 const GiangDay = require('./giangday.model');
 const HocKy = require('./hocky.model');
 const NamHoc = require('./namhoc.model');
-const ChuyenMon = require('./chuyenmon.model');
+const MonHocDaDangKy = require('./monhocdadangky.model');
+const DiemQuaTrinh = require('./diemquatrinh.model');
+
 
 // MonHoc: 1-n :GiangDay
 MonHoc.hasMany(GiangDay, { foreignKey: 'id_monhoc' });
-GiangDay.belongsTo(MonHoc, { foreignKey: 'id_monhoc'});
+GiangDay.belongsTo(MonHoc, { foreignKey: 'id_monhoc' });
 
 
 // HocKy: 1-n :GiangDay
@@ -59,9 +31,17 @@ GiangDay.belongsTo(NamHoc, { foreignKey: 'id_namhoc' });
 GiangVien.hasMany(GiangDay, { foreignKey: 'id_gv' });
 GiangDay.belongsTo(GiangVien, { foreignKey: 'id_gv' });
 
-// MonHoc: n-n :GiangDay
-// GiangVien.belongsToMany(MonHoc, { through: ChuyenMon });
-// MonHoc.belongsToMany(GiangVien, { through: ChuyenMon });
+// Khoa: 1-n :GiangVien
+Khoa.hasMany(GiangVien, { foreignKey: 'id_khoa' });
+GiangVien.belongsTo(Khoa, { foreignKey: 'id_khoa' });
+
+// SinhVien: 1-n :DangKyMonHoc
+SinhVien.hasMany(MonHocDaDangKy, { foreignKey: 'id_sv' });
+MonHocDaDangKy.belongsTo(SinhVien, { foreignKey: 'id_sv' });
+
+// MonHoc: 1-n :DangKyMonHoc
+MonHoc.hasMany(MonHocDaDangKy, { foreignKey: 'id_monhoc' });
+MonHocDaDangKy.belongsTo(MonHoc, { foreignKey: 'id_monhoc' });
 
 
 module.exports = {
@@ -72,5 +52,8 @@ module.exports = {
     MonHoc,
     GiangDay,
     HocKy,
-    MonHoc
+    MonHoc,
+    MonHocDaDangKy,
+    DiemQuaTrinh,
+    NamHoc
 }

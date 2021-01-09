@@ -11,7 +11,7 @@ block content
     div.info
         p= 'Họ tên: ' + hoten
         div.signout
-            a(href="/giangvien/logout") Đăng xuất
+            a(href="/sinhvien/logout") Đăng xuất
 
     .container.pt-5
         .row
@@ -25,17 +25,20 @@ block content
                             th Tín chỉ
                             th Đăng ký
                             th Xoá đăng ký
-                            th 
                     tbody
                         - var n = 1;
-                        each mon in dsmonhoc
-                            tr
-                                td= n++
-                                td= mon.id_monhoc
-                                td= mon.tenmonhoc
-                                td= mon.sotinchi
+                    each mon in dsmonhoc
+                        tr
+                            td
+                                b= n++
+                            td= mon.id_monhoc
+                            td= mon.tenmonhoc
+                            td= mon.sotinchi
+
+                            - var index = dsMonDaDangKy.findIndex( (i) => i.id_monhoc === mon.id_monhoc)
+                            if(index == -1)
                                 td
-                                    button.btn.btn-primary(type='button' data-toggle='modal' data-target='#myModal' + n) Chọn
+                                    button.btn.btn-primary(type='button' data-toggle='modal' data-target='#myModal' + n) Đăng ký
                                     // Nút đăng ký
                                     .modal.fade(role='dialog' id='myModal' + n)
                                         .modal-dialog.modal-xl.modal-dialog-centered(style="max-width: 1350px!important;")
@@ -64,21 +67,24 @@ block content
                                                                             th
 
                                                                     tbody
-                                                                        each chitietmon in chitiethocphan
-                                                                            if mon.id_monhoc == chitietmon.id_monhoc
+                                                                        each chitietmon in mon.giangdays
                                                                                 tr
-                                                                                    td= chitietmon.thu
-                                                                                    td= chitietmon.id_monhoc
+                                                                                    td
+                                                                                        b= chitietmon.thu
+                                                                                    td= mon.id_monhoc
                                                                                     td= chitietmon.nhom
-                                                                                    td= chitietmon.tenmonhoc
+                                                                                    td= mon.tenmonhoc
                                                                                     td= chitietmon.tietday
-                                                                                    td= chitietmon.hoten
+                                                                                    td= chitietmon.giangvien.hoten
                                                                                     td= chitietmon.phonghoc
                                                                                     td= chitietmon.tuan
                                                                                     td
-                                                                                        btn.btn.btn-primary(type='button' onclick=`dangky(${chitietmon.id_monhoc}, ${chitietmon.nhom})`) Đăng ký
+                                                                                        btn.btn.btn-primary(type='button' onclick=`dangky(${mon.id_monhoc}, ${chitietmon.nhom})`) Đăng ký
                                 td
-                                    button.btn.btn-danger(type='button' data-toggle='modal' data-target='#myModal2' + n) Chọn 
+                            else 
+                                td
+                                td
+                                    button.btn.btn-danger(type='button' data-toggle='modal' data-target='#myModal2' + n) Huỷ 
                                     // Nút huỷ đăng ký
                                     .modal.fade(role='dialog' id='myModal2' + n)
                                         .modal-dialog.modal-sm.modal-dialog-centered
@@ -89,11 +95,18 @@ block content
                                                         span(aria-hidden='true') &times;
                                                         span.sr-only Close
                                                 .modal-body
-                                                    p Bạn có chắc muốn xoá?
-                                                    btn.btn.btn-danger Đồng ý
-                                                    btn.btn.btn-light Huỷ
-    
-    .container-fluid.pt-5
+                                                    p= "Bạn có chắc muốn huỷ môn " 
+                                                    p= mon.tenmonhoc  + " ?"
+                                                    btn.btn.btn-primary.ml-5(type='button' onclick=`huydangky(${mon.id_monhoc})`) Đồng ý
+                                                    button.btn.btn-light.close.mr-5(type='button' data-dismiss='modal')
+                                                        span(aria-hidden='true').btn.btn-light.d-inline-block.pl-4.pr-4 Huỷ
+                                                        span.sr-only Close
+                            
+                        
+                            
+                                
+
+    .container-md.pt-5
         .row
             .col
                 .h3 Thời khoá biểu
@@ -102,23 +115,26 @@ block content
                 table.table.table-hover
                     thead
                         tr
-                            th STT
+                            th Thứ
                             th Mã học phần
+                            th Nhóm học phần
                             th Tên học phần
-                            th Tín chỉ
-                            th Đăng ký
-                            th Xoá đăng ký
-                            th 
+                            th Tiết học
+                            th Tên cán bộ
+                            th Phòng học
+                            th Tuần học
                     tbody
-                        - var n = 1;
-                        if dsmonhoc
-                            each mon in dsmonhoc
+                        if dsMonDaDangKy
+                            each _mon in dsMonDaDangKy
                                 tr
-                                    td= n++
-                                    td= mon.id_monhoc
-                                    td= mon.tenmonhoc
-                                    td= mon.sotinchi
-                                    td
+                                    td= _mon.thu
+                                    td= _mon.id_monhoc
+                                    td= _mon.nhom
+                                    td= _mon.tenmonhoc
+                                    td= _mon.tietday
+                                    td= _mon.hoten
+                                    td= _mon.phonghoc
+                                    td= _mon.tuan
 
     script.
         function dangky(maHP, nhomHP) {
@@ -128,6 +144,17 @@ block content
                 data: {
                     maHP,
                     nhomHP
+                }
+            });
+            location.reload();
+            return;
+        }
+        function huydangky(maHP, nhomHP) {
+            axios({
+                method: 'post',
+                url:'/sinhvien/huyhocphan',
+                data: {
+                    maHP
                 }
             });
             location.reload();
