@@ -5,12 +5,12 @@ module.exports.convertDateTime = (str) => {
     return [day, mnth, date.getFullYear()].join("-");
 }
 
-module.exports.KiemTraChuoi = (str1, str2) => {
-    let flag = true;
+module.exports.KiemTraTrung = (str1, str2) => {
+    var flag = false;
     for(let i = 0; i < str1.length; i++){
         for(let j = 0; j < str2.length; j++){
             if(str1[i] == str2[j]){
-                flag = false;
+                flag = true;
                 break;
             }
         }

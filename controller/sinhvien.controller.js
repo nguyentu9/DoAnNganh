@@ -2,21 +2,19 @@ const { SinhVien,
     MonHoc,
     GiangDay,
     GiangVien,
-    MonHocDaDangKy
+    MonHocDaDangKy,
+    DiemQuaTrinh
 } = require('../model/model');
 const db = require('../config/db');
-const { convertDateTime } = require('../helper/util');
 const jwt = require('jsonwebtoken');
-const { KiemTraChuoi } = require('../helper/util');
+const { KiemTraTrung } = require('../helper/util');
 
 module.exports.index = async (req, res) => {
     let { masodangnhap } = res.locals.user; // { masodangnhap, vaitro, iat...}
     try {
         var sv = await SinhVien.findOne({ where: { id_sv: masodangnhap } });
-
     } catch (e) {
         console.log(e);
-        return;
     }
     res.render('sinhvien/index', {
         hoten: sv.hoten
@@ -36,15 +34,12 @@ module.exports.thongTinSinhVien = async (req, res) => {
         user: sv
     });
 }
-async function _dangKyHocPhan(req, res, err = null) {
+
+
+async function _dangKyHocPhan(req, res, er = null, ss = null){
     try {
         let tokenDecoded = await jwt.verify(req.cookies.token, process.env.JWT_KEY);
         var mssv = tokenDecoded.masodangnhap;
-    } catch (e) {
-       console.log(e);
-    }
-
-    try {
         var sv = await SinhVien.findOne({ where: { id_sv: mssv } });
         var dsMon = await MonHoc.findAll({
             include: [{
@@ -61,7 +56,6 @@ async function _dangKyHocPhan(req, res, err = null) {
             }]
         });
 
-       
         let sql = `select thu, gd.id_monhoc, gd.nhom, tenmonhoc, tietday, gv.hoten, phonghoc, tuan 
                     from giangday gd 
                     inner join monhoc m on gd.id_monhoc = m.id_monhoc 
@@ -77,18 +71,24 @@ async function _dangKyHocPhan(req, res, err = null) {
             hoten: sv.hoten,
             dsmonhoc: dsMon,
             dsMonDaDangKy: dsMonDaDangKy[0],
-            err
+            er,
+            ss
         });
 
     } catch (e) {
         console.log(e);
     }
-} 
+}
+
 module.exports.dangKyHocPhan = async (req, res) => {
     _dangKyHocPhan(req, res);
 };
 
+
+
 module.exports.postDangKyHocPhan = async (req, res) => {
+    
+    
     var { maHP, nhomHP } = req.body; //{ maHP: 30073, nhomHP: 1 }
     try {
         let tokenDecoded = await jwt.verify(req.cookies.token, process.env.JWT_KEY);
@@ -117,6 +117,7 @@ module.exports.postDangKyHocPhan = async (req, res) => {
                 id_namhoc: 2,
                 ngaydk: new Date().toISOString().slice(0, 10)
             });
+            _dangKyHocPhan(req, res, null, 'Đăng ký học phần thành công');
             return;
         }
 
@@ -134,7 +135,6 @@ module.exports.postDangKyHocPhan = async (req, res) => {
                 }
             });
         });
-        
         let thongtinMonDaDangKy = await Promise.all(prm);
         thongtinMonDaDangKy = thongtinMonDaDangKy.flat();
         
@@ -150,27 +150,30 @@ module.exports.postDangKyHocPhan = async (req, res) => {
                 nhom: nhomHP
             }
         });
-        
 
-       
-
-        var obj = thongtinMonDangDangKy;
-        for( let mon of thongtinMonDaDangKy) {
-            if(mon.thu != obj.thu && KiemTraChuoi(mon.tietday, obj.tietday)){  // trùng lịch
-                const _mon = await MonHocDaDangKy.create({
-                    id_sv: mssv,
-                    id_monhoc: maHP,
-                    nhom: nhomHP,
-                    id_hk: 1,
-                    id_namhoc: 2,
-                    ngaydk: new Date().toISOString().slice(0, 10)
-                });
+        var obj = thongtinMonDangDangKy; // Kiểm tra môn đang đăng ký
+        var biTrung = false;
+        for( let mon of thongtinMonDaDangKy) {  // với các môn đã đăng ký có trùng lịch
+            if(mon.thu == obj.thu && KiemTraTrung(mon.tietday, obj.tietday)){ 
+                biTrung = true;
+                _dangKyHocPhan(req, res, `Lỗi bị trùng`);
+                break;
             }
         }
-
+        
+        if(!biTrung){
+            const _mon = await MonHocDaDangKy.create({
+                id_sv: mssv,
+                id_monhoc: maHP,
+                nhom: nhomHP,
+                id_hk: 1,
+                id_namhoc: 2,
+                ngaydk: new Date().toISOString().slice(0, 10)
+            })
+            _dangKyHocPhan(req, res, null, 'Đăng ký học phần thành công');
+        }
     } catch (e) {
         console.log(e);
-        return;
     }
 }
 
@@ -186,8 +189,34 @@ module.exports.postHuyHocPhan = async (req, res) => {
                 id_monhoc: maHP
             }
         });
+        _dangKyHocPhan(req, res, null, 'Huỷ học phần thành công');
     } catch(e){
         console.log(e);
         res.redirect('/login');
     }
+}
+
+
+module.exports.ketQuaHocTap = async (req, res) => {
+    try {
+        let tokenDecoded = await jwt.verify(req.cookies.token, process.env.JWT_KEY);
+        var mssv = tokenDecoded.masodangnhap;
+
+        var sv = await SinhVien.findOne({ attributes: ['hoten'], where: { id_sv: mssv } });
+         
+        var dsMonHoc = await db.query(`select d.id_monhoc, m.tenmonhoc, d.nhom, m.sotinchi 
+        from dangkymonhoc d 
+        inner join monhoc m on d.id_monhoc = m.id_monhoc where id_sv='${mssv}';`);
+
+        var dsDiemQuaTrinh = await DiemQuaTrinh.findAll({ where: {id_sv: mssv} });
+    } catch (e) {
+       console.log(e);
+       return;
+    }
+
+    res.render('sinhvien/ketquahoctap',{
+        hoten: sv.hoten,
+        dsMonHoc: dsMonHoc[0],
+        dsDiemQuaTrinh
+    });
 }

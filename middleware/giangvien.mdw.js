@@ -4,6 +4,6 @@ module.exports.laGiangVien = async (req, res, next) => {
     if (token && token.vaitro == 'gv') {
         next();
     } else {
-        res.redirect('back');
+        res.redirect('/login');
     }
 }

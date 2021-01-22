@@ -9,9 +9,9 @@ module.exports.dangnhap = (req, res, next) => {
 
 module.exports.postDangnhap = async (req, res) => {
 
-    const { masodangnhap, matkhau: matkhaudangnhap } = req.body;
+    const { masodangnhap, matkhau } = req.body;
 
-    if (masodangnhap.length == 0 || matkhaudangnhap.length == 0) {
+    if (masodangnhap.length == 0 || matkhau.length == 0) {
         res.render('login', {
             error: 'Thông tin đăng nhập không được để trống'
         });
@@ -22,7 +22,7 @@ module.exports.postDangnhap = async (req, res) => {
         var row = await TaiKhoan.findOne({ 
             where: { 
                 masodangnhap,
-                matkhau : matkhaudangnhap
+                matkhau
             }
         });
     } catch (e) {
@@ -37,6 +37,7 @@ module.exports.postDangnhap = async (req, res) => {
         return;
     }
     let { vaitro } = row;
+    
     let data = {
         masodangnhap,
         vaitro

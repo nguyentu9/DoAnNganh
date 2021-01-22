@@ -7,13 +7,21 @@ block content
     nav.navbar.navbar-light.bg-blue.banner(style='background-image: url("/images/bg_banner.png");')
         a.navbar-brand(href='/sinhvien')
             img.d-inline-block.align-top(src='/images/banner.png')
-        h4#tag Sinh viên
+        h4#tag Sinh viên đăng ký học phần
     div.info
         p= 'Họ tên: ' + hoten
         div.signout
             a(href="/sinhvien/logout") Đăng xuất
 
     .container.pt-5
+        if er
+            .row
+                .col-4.mx-auto
+                    .alert.alert-danger.mx-auto#er= er
+        if ss
+            .row
+                .col-4.mx-auto
+                    .alert.alert-success.mx-auto#ss= ss
         .row
             .col
                 table.table.table-hover
@@ -68,18 +76,22 @@ block content
 
                                                                     tbody
                                                                         each chitietmon in mon.giangdays
-                                                                                tr
-                                                                                    td
-                                                                                        b= chitietmon.thu
-                                                                                    td= mon.id_monhoc
-                                                                                    td= chitietmon.nhom
-                                                                                    td= mon.tenmonhoc
-                                                                                    td= chitietmon.tietday
-                                                                                    td= chitietmon.giangvien.hoten
-                                                                                    td= chitietmon.phonghoc
-                                                                                    td= chitietmon.tuan
-                                                                                    td
-                                                                                        btn.btn.btn-primary(type='button' onclick=`dangky(${mon.id_monhoc}, ${chitietmon.nhom})`) Đăng ký
+                                                                            tr
+                                                                                td
+                                                                                    b= chitietmon.thu
+                                                                                td= mon.id_monhoc
+                                                                                td= chitietmon.nhom
+                                                                                td= mon.tenmonhoc
+                                                                                td= chitietmon.tietday
+                                                                                td= chitietmon.giangvien.hoten
+                                                                                td= chitietmon.phonghoc
+                                                                                td= chitietmon.tuan
+                                                                                td
+                                                                                    form(action="/sinhvien/dangkyhocphan", method="post")
+                                                                                        input(type="text" name='maHP' value=mon.id_monhoc style='display:none')
+                                                                                        input(type='text' name='nhomHP' value=chitietmon.nhom style='display:none')
+                                                                                        input.btn.btn-primary(type='submit' value='Đăng ký')
+                                                                                        //button.btn.btn-primary(type='submit' onclick=`dangky(${mon.id_monhoc}, ${chitietmon.nhom})`) Đăng ký
                                 td
                             else 
                                 td
@@ -97,66 +109,44 @@ block content
                                                 .modal-body
                                                     p= "Bạn có chắc muốn huỷ môn " 
                                                     p= mon.tenmonhoc  + " ?"
-                                                    btn.btn.btn-primary.ml-5(type='button' onclick=`huydangky(${mon.id_monhoc})`) Đồng ý
-                                                    button.btn.btn-light.close.mr-5(type='button' data-dismiss='modal')
-                                                        span(aria-hidden='true').btn.btn-light.d-inline-block.pl-4.pr-4 Huỷ
-                                                        span.sr-only Close
-                            
-                        
-                            
-                                
+                                                    form(action="/sinhvien/huyhocphan", method="post")
+                                                        input(type="text" name='maHP' value=mon.id_monhoc style='display:none')
+                                                        input.btn.btn-danger.ml-5(type='submit' value='Đồng ý')
+                                                        //button.btn.btn-danger.ml-5(type='button' onclick=`huydangky(${mon.id_monhoc})`) Đồng ý
+                                                        button.btn.btn-light.close.mr-5(type='button' data-dismiss='modal')
+                                                            span(aria-hidden='true').btn.btn-light.d-inline-block.pl-3.pr-3 Không
+                                                            span.sr-only Close
 
-    .container-md.pt-5
-        .row
-            .col
-                .h3 Thời khoá biểu
-        .row
-            .col
-                table.table.table-hover
-                    thead
-                        tr
-                            th Thứ
-                            th Mã học phần
-                            th Nhóm học phần
-                            th Tên học phần
-                            th Tiết học
-                            th Tên cán bộ
-                            th Phòng học
-                            th Tuần học
-                    tbody
-                        if dsMonDaDangKy
-                            each _mon in dsMonDaDangKy
-                                tr
-                                    td= _mon.thu
-                                    td= _mon.id_monhoc
-                                    td= _mon.nhom
-                                    td= _mon.tenmonhoc
-                                    td= _mon.tietday
-                                    td= _mon.hoten
-                                    td= _mon.phonghoc
-                                    td= _mon.tuan
 
-    script.
-        function dangky(maHP, nhomHP) {
-            axios({
-                method: 'post',
-                url:'/sinhvien/dangkyhocphan',
-                data: {
-                    maHP,
-                    nhomHP
-                }
-            });
-            location.reload();
-            return;
-        }
-        function huydangky(maHP, nhomHP) {
-            axios({
-                method: 'post',
-                url:'/sinhvien/huyhocphan',
-                data: {
-                    maHP
-                }
-            });
-            location.reload();
-            return;
-        }
+
+
+
+        .container-md.pt-5
+            .row
+                .col
+                    .h3 Thời khoá biểu
+            .row
+                .col
+                    table.table.table-hover
+                        thead
+                            tr
+                                th Thứ
+                                th Mã học phần
+                                th Nhóm học phần
+                                th Tên học phần
+                                th Tiết học
+                                th Tên cán bộ
+                                th Phòng học
+                                th Tuần học
+                        tbody
+                            if dsMonDaDangKy
+                                each _mon in dsMonDaDangKy
+                                    tr
+                                        td= _mon.thu
+                                        td= _mon.id_monhoc
+                                        td= _mon.nhom
+                                        td= _mon.tenmonhoc
+                                        td= _mon.tietday
+                                        td= _mon.hoten
+                                        td= _mon.phonghoc
+                                        td= _mon.tuan

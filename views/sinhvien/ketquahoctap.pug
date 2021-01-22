@@ -1,0 +1,72 @@
+extends ../layouts/header.pug
+append head
+    title='Kết quả học tập'
+    script(src='https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js')
+
+block content
+    nav.navbar.navbar-light.bg-blue.banner(style='background-image: url("/images/bg_banner.png");')
+        a.navbar-brand(href='/sinhvien')
+            img.d-inline-block.align-top(src='/images/banner.png')
+        h4#tag Kết quả học tập sinh viên
+    div.info
+        p= 'Họ tên: ' + hoten
+        div.signout
+            a(href="/sinhvien/logout") Đăng xuất
+
+    .container-fluid.pt-5
+        .row
+            .col
+                h5 Học kì: 1 - Năm học: 2020-2021
+        .row
+            .col
+                table.table.table-hover
+                    thead
+                        tr
+                            th STT
+                            th Mã học phần
+                            th Tên học phần
+                            th Nhóm học phần
+                            th DVHT
+                            th Điểm hệ 10
+                            th Điểm hệ 4 (Chữ)
+                            th Điểm hệ 4 (Số)
+                            th Chi tiết
+                    tbody
+                        - var n = 1;
+                    each mon in dsMonHoc
+                        each _mon in dsDiemQuaTrinh
+                            tr
+                                td
+                                    b= n++
+                                td= mon.id_monhoc
+                                td= mon.tenmonhoc
+                                td= mon.nhom
+                                td= mon.sotinchi
+                                if mon.id_monhoc == _mon.id_mon
+                                    - var diemHe10 = (_mon.thuongxuyen + _mon.chuyencan + _mon.giuahocphan * 2 + _mon.thuchanh * 2) / 6
+                                    td= diemHe10
+                                    td= (diemHe10 >= 9) ? 'A+' : (diemHe10 >= 8.5) ? 'A' : (diemHe10 >= 8) ? 'B+' : (diemHe10 >= 7) ? 'B' : (diemHe10 >= 6.5) ? 'C+':(diemHe10 >= 5.5) ? 'C' :(diemHe10 >= 5) ? 'D+' : (diemHe10 >= 4) ? 'D' : 'F' 
+                                    td= (diemHe10 >= 9) ? 4 : (diemHe10 >= 8.5) ? 3.7 : (diemHe10 >= 8) ? 3.5 : (diemHe10 >= 7) ? 3 : (diemHe10 >= 6.5) ? 2.5 :(diemHe10 >= 5.5) ? 2 :(diemHe10 >= 5) ? 1.5 : (diemHe10 >= 4) ? 1 : 0 
+                                    td
+                                        button.btn.btn-primary(type='button' data-toggle='modal' data-target='#m' + n) Chi tiết 
+                                        // Nút chi tiết
+                                        .modal.fade(role='dialog' id='m' + n)
+                                            .modal-dialog.modal-md.modal-dialog-centered
+                                                .modal-content
+                                                    .modal-header
+                                                        h5.modal-title Chi tiết điểm môn học
+                                                        button.close(type='button' data-dismiss='modal')
+                                                            span(aria-hidden='true') &times;
+                                                            span.sr-only Close
+                                                    .modal-body
+                                                        table.table.table-hover
+                                                            thead
+                                                                tr
+                                                                    td Điểm Kiểm tra thường xuyên 1
+                                                                    td= _mon.thuongxuyen
+                                                                tr
+                                                                    td Điểm Thi giữa học phần
+                                                                    td= _mon.giuahocphan
+                                                                tr
+                                                                    td Điểm Kết thúc học phần
+                                                                    td Chưa có

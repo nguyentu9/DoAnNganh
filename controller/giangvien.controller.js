@@ -1,8 +1,7 @@
-const fs = require('fs');
 const path = require('path');
 const jwt = require('jsonwebtoken');
 
-const { GiangDay, GiangVien, Khoa, NamHoc, SinhVien, MonHocDaDangKy,DiemQuaTrinh } = require('../model/model');
+const { GiangDay, GiangVien, Khoa, NamHoc, DiemQuaTrinh } = require('../model/model');
 const db = require('../config/db');
 const { XoaDau } = require('../helper/util');
 
@@ -30,14 +29,12 @@ function uploadAsync(req, res){
     return new Promise(function(resolve,reject){
         upload(req,res,function(err){
             if(err !== undefined) return reject(err);
+            if(req.file.path == undefined) return reject('Lỗi');
             resolve(req.file.path);
         });
    });
 }
 // ========================
-
-
-
 
 // giangvien/index
 module.exports.index = async (req, res) => {
@@ -46,8 +43,8 @@ module.exports.index = async (req, res) => {
         var gv = await GiangVien.findOne({ where: { id_gv: masodangnhap } });
     } catch (e) {
         console.log(e);
-        return;
     }
+
     res.render('giangvien/index', {
         hoten: gv.hoten
     });
@@ -63,8 +60,6 @@ module.exports.logout = (req, res) => {
 module.exports.thongTinGiangVien = async (req, res) => {
     let { masodangnhap } = res.locals.user;
     try {
-
-
         var gv = await GiangVien.findOne({
             where: {
                 id_gv: masodangnhap
@@ -123,7 +118,7 @@ module.exports.lichDay = async (req, res) => {
         let sql = `SELECT thu, g.id_monhoc, m.tenmonhoc, tietday, phonghoc, tuan, thu from giangday g 
                     INNER JOIN monhoc m on g.id_monhoc = m.id_monhoc WHERE id_gv='${masodangnhap}' order by thu;`;
         var lichday = await db.query(sql);
-        _lichday = lichday[0].flat();
+        lichday = lichday[0].flat();
 
     } catch (e) {
         console.log(e);
@@ -131,7 +126,7 @@ module.exports.lichDay = async (req, res) => {
     }
     res.render('giangvien/lichday', {
         hoten: gv.hoten,
-        lichday: _lichday
+        lichday
     });
 }
 
@@ -141,18 +136,32 @@ async function _quanLyDiem(req, res, er = null, ss = null) {
     try {
         var gv = await GiangVien.findOne({ where: { id_gv: masodangnhap } });
 
-        let sql = `SELECT m.id_monhoc, m.tenmonhoc, nhom, g.trangthai FROM giangday g 
-                    INNER JOIN monhoc m on g.id_monhoc = m.id_monhoc WHERE g.id_gv = '${masodangnhap}'`;
-        var diem = await db.query(sql);
-        _diem = diem[0].flat();
-        console.log(_diem);
+        var sql = `SELECT m.id_monhoc, m.tenmonhoc, nhom, g.trangthai 
+                    FROM giangday g 
+                    INNER JOIN monhoc m on g.id_monhoc = m.id_monhoc 
+                    WHERE g.id_gv = '${masodangnhap}'`;
+        var dsmon = await db.query(sql);
+        dsmon = dsmon[0].flat();
+
+        var arr = await Promise.all(dsmon.map( async mon => {
+            if(mon.trangthai){
+                var dssv = await db.query(`
+                        select d.id_sv, s.hoten, thuongxuyen, chuyencan, giuahocphan, thuchanh 
+                        from diemquatrinh d inner join 
+                        sinhvien s on d.id_sv = s.id_sv 
+                        where id_hk=1 and id_namhoc=2 and id_mon='${mon.id_monhoc}'`);
+                mon.dssv = dssv[0].flat();
+            }
+            return mon;
+        }))
+
     } catch (e) {
         console.log(e);
         return;
     }
     res.render('giangvien/quanlydiem', {
         hoten: gv.hoten,
-        diem: _diem,
+        dsmon: arr,
         er,
         ss
     });
@@ -219,9 +228,9 @@ module.exports.postQuanlyDiem = async (req, res) => {
         _quanLyDiem(req, res, null, 'Nhập điểm thành công');
     }catch(e) {
         console.log(e);
+        _quanLyDiem(req, res, null, 'Nhập điểm thất bại');
     }
 }
-
 
 
 // giangvien/filemau (post)

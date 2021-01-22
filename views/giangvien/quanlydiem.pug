@@ -1,13 +1,13 @@
 extends ../layouts/header.pug
 append head
-    title='Trang thông tin'
+    title='Trang quản lý điểm'
     link(rel="stylesheet", href="/css/custom_qldiem.css")
     script(src='https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js')
 block content
     nav.navbar.navbar-light.bg-blue.banner(style='background-image: url("/images/bg_banner.png");')
             a.navbar-brand(href='/giangvien')
                 img.d-inline-block.align-top(src='/images/banner.png')
-            h4#tag Giảng viên
+            h4#tag Giảng viên quản lý điểm
     div.info
         p= 'Họ tên: ' + hoten
         div.signout
@@ -39,7 +39,7 @@ block content
                             th 
                     tbody
                         - var n = 1;
-                        each mon in diem
+                        each mon in dsmon
                             tr
                                 td= n++
                                 td= mon.id_monhoc
@@ -48,7 +48,41 @@ block content
                                 if mon.trangthai == 1
                                     td Đã nhập điểm
                                     td
-                                        btn.btn.btn-primary(type='button') In kết quả
+                                        button.btn.btn-primary(type='button' data-toggle='modal' data-target='#myModal' + n + n) In kết quả
+                                        // Đã nhập điểm
+                                        .modal.fade(role='dialog' id='myModal' + n + n)
+                                            .modal-dialog.modal-xl.modal-dialog-centered
+                                                .modal-content
+                                                    .modal-header
+                                                        h5.modal-title= mon.id_monhoc + " - " + mon.nhom + " - " + mon.tenmonhoc + " - Xem Kết Quả"
+                                                        button.close(type='button' data-dismiss='modal')
+                                                            span(aria-hidden='true') &times;
+                                                            span.sr-only Close
+                                                    .modal-body
+                                                        table.table.table-hover
+                                                            thead
+                                                                tr
+                                                                    th STT
+                                                                    th MSSV
+                                                                    th Họ tên
+                                                                    th Điểm thường xuyên
+                                                                    th Điểm chuyên cần
+                                                                    th Điểm giữa học phần
+                                                                    th Điểm thực hành
+                                                            tbody
+                                                                - var m = 1;
+                                                                each sv in mon.dssv
+                                                                    tr
+                                                                        td= m++
+                                                                        td= sv.id_sv
+                                                                        td= sv.hoten
+                                                                        td= sv.thuongxuyen
+                                                                        td= sv.chuyencan
+                                                                        td= sv.giuahocphan
+                                                                        td= sv.thuchanh
+
+
+
                                     td
                                 if mon.trangthai == null
                                     td Chưa nhập điểm
@@ -61,7 +95,7 @@ block content
                                             .modal-dialog.modal-md.modal-dialog-centered
                                                 .modal-content
                                                     .modal-header
-                                                        h5.modal-title= mon.id_monhoc + " - " + mon.nhom + " - " + mon.tenmonhoc + " - Nhập điểm"
+                                                        h5.modal-title= mon.id_monhoc + " - " + mon.nhom + " - " + mon.tenmonhoc
                                                         button.close(type='button' data-dismiss='modal')
                                                             span(aria-hidden='true') &times;
                                                             span.sr-only Close
@@ -72,13 +106,18 @@ block content
                                                         h6.d-inline-block(style='padding:8.5px; margin:0')  Tải file lên
                                                         form(action='/giangvien/quanlydiem' method='post' enctype="multipart/form-data")
                                                             label(for='file')
-                                                            input#file(type='file' name='file').btn.btn-light
+                                                            input#file(type='file' name='file').btn.btn-light.required
                                                             br
                                                             br
-                                                            input(type='submit').btn.btn-primary
+                                                            input(type='submit' onclick='reload()').btn.btn-primary
 
 
-    script.
+    script. 
+        function reload(){
+            setTimeout(() => {
+                location.reload();
+            }, 2000);
+        }
         function layFileMau(maHP, tenHP, nhomHP) {
              axios({
                 method: 'post',
